@@ -52,20 +52,25 @@ y = tf.placeholder('float', [None, 1])
 
 w0 = tf.Variable(tf.zeros([1]))
 
-#[p]
+# [p]
 w = tf.Variable(initial_value=tf.random_normal(shape=[p], mean=0, stddev=0.1))
 
+# [k, p]
 v = tf.Variable(tf.random_normal([k, p], mean=0, stddev=0.01))
 
 linear_terms = tf.add(w0, tf.reduce_sum(
-    tf.multiply(w, x), 1, keep_dims=True))  # n * 1
+    tf.multiply(w, x), 1, keep_dims=True)) 
 
 pair_interactions = 0.5 * tf.reduce_sum(
     tf.subtract(
-        tf.pow(
-            tf.matmul(x, tf.transpose(v)), 2),
-        tf.matmul(tf.pow(x, 2), tf.transpose(tf.pow(v, 2)))
-    ), axis=1, keep_dims=True)
+        tf.pow(tf.matmul(x, tf.transpose(v)), 2),
+        tf.matmul(
+            tf.pow(x, 2),
+            tf.transpose(tf.pow(v, 2))
+        )
+    ),
+    axis=1,
+    keep_dims=True)
 
 
 y_hat = tf.add(linear_terms, pair_interactions)
@@ -105,7 +110,8 @@ with tf.Session() as sess:
 
     loss = sess.run(loss, feed_dict={x: x_test, y: y_test})
     print("loss:", loss)
-    RMSE = np.sqrt(loss)
+    error = sess.run(error, feed_dict={x: x_test, y: y_test})
+    RMSE = np.sqrt(error)
     print("rmse:", RMSE)
 
     predict = sess.run(y_hat, feed_dict={x: x_test[0:10]})
