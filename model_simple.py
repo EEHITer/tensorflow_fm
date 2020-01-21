@@ -23,7 +23,8 @@ test["item"] = test["item"].apply(lambda x: "c"+str(x))
 test["user"] = test["user"].apply(lambda x: "u"+str(x))
 
 all_df = pd.concat([train, test])
-print("all_df head", all_df.head())
+all_df=all_df[['user', 'item']]
+print("all_df head\n", all_df.head())
 
 vec = DictVectorizer()
 vec.fit_transform(all_df.to_dict(orient='record'))
@@ -44,7 +45,7 @@ print("y_test shape", y_test.shape)
 
 n, p = x_train.shape
 
-k = 40
+k = 60
 
 x = tf.placeholder('float', [None, p])
 
@@ -90,10 +91,10 @@ error = tf.reduce_mean(tf.square(y-y_hat))
 loss = tf.add(error, l2_norm)
 
 
-train_op = tf.train.GradientDescentOptimizer(learning_rate=0.02).minimize(loss)
+train_op = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(loss)
 
 
-epochs = 10
+epochs = 60
 
 # Launch the graph
 init = tf.global_variables_initializer()
@@ -115,4 +116,4 @@ with tf.Session() as sess:
     print("rmse:", RMSE)
 
     predict = sess.run(y_hat, feed_dict={x: x_test[0:10]})
-    print("predict:", predict)
+    print("predict:\n", predict)
